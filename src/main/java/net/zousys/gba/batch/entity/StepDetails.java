@@ -13,7 +13,7 @@ public class StepDetails {
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
     private String name;
     private String status;
     private String parameters;

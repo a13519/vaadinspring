@@ -1,56 +1,36 @@
 package net.zousys.gba.batch.config;
 
+import lombok.RequiredArgsConstructor;
 import net.zousys.gba.batch.entity.JobDetails;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
+import net.zousys.gba.batch.entity.JobDetailsRepository;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.data.RepositoryItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.LineMapper;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.batch.core.repository.JobRepository;
-import lombok.RequiredArgsConstructor;
-import net.zousys.gba.batch.entity.JobDetailsRepository;
+
+import javax.sql.DataSource;
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
 public class BatchConfig {
 
     private final JobRepository jobRepository;
+    private final DataSource dataSource;
+    private final PlatformTransactionManager transactionManager;
     private final PlatformTransactionManager platformTransactionManager;
     private final JobDetailsRepository repository;
-
-    @Bean
-    public FlatFileItemReader<JobDetails> reader() {
-        FlatFileItemReader<JobDetails> itemReader = new FlatFileItemReader<>();
-        itemReader.setResource(new FileSystemResource("src/main/resources/students.csv"));
-        itemReader.setName("csvReader");
-        itemReader.setLinesToSkip(1);
-        itemReader.setLineMapper(lineMapper());
-        return itemReader;
-    }
-
-
-    @Bean
-    public RepositoryItemWriter<JobDetails> writer() {
-        RepositoryItemWriter<JobDetails> writer = new RepositoryItemWriter<>();
-        writer.setRepository(repository);
-        writer.setMethodName("save");
-        return writer;
-    }
 
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -60,11 +40,19 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job runJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Job aJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new JobBuilder("importStudents", jobRepository)
                 .start(step1(jobRepository, transactionManager))
                 .build();
 
+    }
+
+    @Bean
+    public org.springframework.batch.core.launch.JobLauncher myJobLauncher() {
+        TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        return jobLauncher;
     }
 
     @Bean
@@ -74,34 +62,55 @@ public class BatchConfig {
         return asyncTaskExecutor;
     }
 
-    private LineMapper<JobDetails> lineMapper() {
-        DefaultLineMapper<JobDetails> lineMapper = new DefaultLineMapper<>();
-
-        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setDelimiter(",");
-        lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("id", "firstName", "lastName", "age");
-
-        BeanWrapperFieldSetMapper<JobDetails> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(JobDetails.class);
-
-        lineMapper.setLineTokenizer(lineTokenizer);
-        lineMapper.setFieldSetMapper(fieldSetMapper);
-        return lineMapper;
+    /**
+     *
+     */
+    public static class SampleTasklet implements Tasklet {
+        public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+            try {
+                Thread.sleep(10000);
+                System.out.println("done...");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return RepeatStatus.FINISHED;
+        }
     }
 
     /**
      *
      */
-    public class SampleTasklet implements Tasklet {
+    @Component
+    public static class JobListener implements JobExecutionListener {
+        @Autowired
+        private JobDetailsRepository jobDetailsRepository;
 
-
-        public RepeatStatus execute(StepContribution contribution,
-                                    ChunkContext chunkContext) throws Exception {
-
-            return RepeatStatus.FINISHED;
+        /**
+         *
+         * @param jobExecution the current {@link JobExecution}
+         */
+        public void beforeJob(JobExecution jobExecution) {
+            JobDetails jobDetails = JobDetails.builder()
+                    .id(jobExecution.getJobId())
+                    .name(jobExecution.getJobInstance().getJobName())
+                    .log("xxx")
+                    .status(jobExecution.getStatus().toString())
+                    .batchJobExeId(jobExecution.getJobId())
+                    .build();
+            jobDetailsRepository.save(jobDetails);
         }
 
-
+        /**
+         *
+         * @param jobExecution the current {@link JobExecution}
+         */
+        public void afterJob(JobExecution jobExecution) {
+            Optional<JobDetails> ojobDetails = jobDetailsRepository.findById(jobExecution.getId());
+            JobDetails jobDetails = ojobDetails.get();
+            if (jobDetails != null) {
+                jobDetails.setStatus(jobExecution.getStatus().toString());
+                jobDetailsRepository.save(jobDetails);
+            }
+        }
     }
 }

@@ -51,7 +51,7 @@ public class MainLayout extends AppLayout{
 
     private VerticalLayout newListView() {
         VerticalLayout vl = new VerticalLayout();
-        vl.add(new Button("ABC"));
+        vl.add(new com.vaadin.flow.component.Text("This is private system, please don't try to login if you are not granted the access"));
         return vl;
     }
 }

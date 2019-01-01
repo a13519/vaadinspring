@@ -23,7 +23,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.vaadin</groupId>
+                <groupId>com.vaadin </groupId>
                 <artifactId>vaadin-bom</artifactId>
                 <version>${vaadin.version}</version>
                 <type>pom</type>

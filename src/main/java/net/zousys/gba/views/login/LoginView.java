@@ -4,6 +4,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.AbstractLogin;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -35,7 +36,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver,
 
         login.addLoginListener(this);
 
-        add(new H1("Test Application"), login);
+        add(new Image("/Users/songzou/Documents/IdeaProjects/greenbotair/src/main/resources/PNG image-673108EA422D-1.png",""), login);
     }
 
     @Override
