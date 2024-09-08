@@ -1,4 +1,4 @@
-package net.zousys.gba.views;
+package net.zousys.gba.facade;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -9,7 +9,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("My View")
 @Menu(icon = "line-awesome/svg/pencil-ruler-solid.svg", order = 0)

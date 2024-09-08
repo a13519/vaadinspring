@@ -1,4 +1,4 @@
-package net.zousys.gba.views;
+package net.zousys.gba.facade;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -7,14 +7,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.router.HighlightConditions;
-import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 import net.zousys.gba.security.SecurityService;
-
-import javax.swing.text.html.ListView;
 
 
 public class MainLayout extends AppLayout{

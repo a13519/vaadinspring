@@ -4,7 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import net.zousys.gba.views.login.LoginView;
+import net.zousys.gba.facade.login.LoginView;
 import org.springframework.stereotype.Component;
 
 @Component

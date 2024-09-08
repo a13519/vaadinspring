@@ -4,10 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/project/d7d7a3eb-bbf9-49bf-bac7-ca4988466260 -->
     <groupId>net.zousys.gba</groupId>
-    <artifactId>my-app</artifactId>
+    <artifactId>Josher</artifactId>
     <name>my-app</name>
+    <modules>
+        <module>bone</module>
+    </modules>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <properties>
         <java.version>17</java.version>
