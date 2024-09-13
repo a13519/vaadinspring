@@ -1,8 +1,8 @@
-import { createMenuItems, useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
-import { effect, signal } from '@vaadin/hilla-react-signals';
-import { AppLayout, DrawerToggle, Icon, SideNav, SideNavItem } from '@vaadin/react-components';
-import { Suspense, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {createMenuItems, useViewConfig} from '@vaadin/hilla-file-router/runtime.js';
+import {effect, signal} from '@vaadin/hilla-react-signals';
+import {AppLayout, DrawerToggle, Icon, SideNav, SideNavItem} from '@vaadin/react-components';
+import {Suspense, useEffect} from 'react';
+import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
