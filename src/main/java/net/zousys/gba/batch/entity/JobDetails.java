@@ -1,4 +1,4 @@
-package net.zousys.gba.batch.student;
+package net.zousys.gba.batch.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,12 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Student {
+public class JobDetails {
 
     @Id
     @GeneratedValue
     private Integer id;
-    private String firstname;
-    private String lastname;
-    private int age;
+    private String name;
+    private String status;
+    private String parameters;
+    private Integer batchJobId;
 }

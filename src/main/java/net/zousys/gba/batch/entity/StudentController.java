@@ -1,4 +1,4 @@
-package net.zousys.gba.batch.student;
+package net.zousys.gba.batch.entity;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

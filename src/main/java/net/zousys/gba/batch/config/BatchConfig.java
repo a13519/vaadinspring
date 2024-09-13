@@ -1,6 +1,6 @@
 package net.zousys.gba.batch.config;
 
-import net.zousys.gba.batch.student.Student;
+import net.zousys.gba.batch.entity.JobDetails;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -19,7 +19,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.batch.core.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
-import net.zousys.gba.batch.student.StudentRepository;
+import net.zousys.gba.batch.entity.JobDetailsRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -27,11 +27,11 @@ public class BatchConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
-    private final StudentRepository repository;
+    private final JobDetailsRepository repository;
 
     @Bean
-    public FlatFileItemReader<Student> reader() {
-        FlatFileItemReader<Student> itemReader = new FlatFileItemReader<>();
+    public FlatFileItemReader<JobDetails> reader() {
+        FlatFileItemReader<JobDetails> itemReader = new FlatFileItemReader<>();
         itemReader.setResource(new FileSystemResource("src/main/resources/students.csv"));
         itemReader.setName("csvReader");
         itemReader.setLinesToSkip(1);
@@ -40,14 +40,14 @@ public class BatchConfig {
     }
 
     @Bean
-    public StudentProcessor processor() {
-        return new StudentProcessor();
+    public JobDetailsProcessor processor() {
+        return new JobDetailsProcessor();
     }
 
 
     @Bean
-    public RepositoryItemWriter<Student> writer() {
-        RepositoryItemWriter<Student> writer = new RepositoryItemWriter<>();
+    public RepositoryItemWriter<JobDetails> writer() {
+        RepositoryItemWriter<JobDetails> writer = new RepositoryItemWriter<>();
         writer.setRepository(repository);
         writer.setMethodName("save");
         return writer;
@@ -56,7 +56,7 @@ public class BatchConfig {
     @Bean
     public Step step1() {
         return new StepBuilder("csvImport", jobRepository)
-                .<Student, Student>chunk(1000, platformTransactionManager)
+                .<JobDetails, JobDetails>chunk(1000, platformTransactionManager)
                 .reader(reader())
                 .processor(processor())
                 .writer(writer())
@@ -79,16 +79,16 @@ public class BatchConfig {
         return asyncTaskExecutor;
     }
 
-    private LineMapper<Student> lineMapper() {
-        DefaultLineMapper<Student> lineMapper = new DefaultLineMapper<>();
+    private LineMapper<JobDetails> lineMapper() {
+        DefaultLineMapper<JobDetails> lineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
         lineTokenizer.setNames("id", "firstName", "lastName", "age");
 
-        BeanWrapperFieldSetMapper<Student> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(Student.class);
+        BeanWrapperFieldSetMapper<JobDetails> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(JobDetails.class);
 
         lineMapper.setLineTokenizer(lineTokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
