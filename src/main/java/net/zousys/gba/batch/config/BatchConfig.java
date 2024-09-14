@@ -3,14 +3,18 @@ package net.zousys.gba.batch.config;
 import net.zousys.gba.batch.entity.JobDetails;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -39,11 +43,6 @@ public class BatchConfig {
         return itemReader;
     }
 
-    @Bean
-    public JobDetailsProcessor processor() {
-        return new JobDetailsProcessor();
-    }
-
 
     @Bean
     public RepositoryItemWriter<JobDetails> writer() {
@@ -54,20 +53,16 @@ public class BatchConfig {
     }
 
     @Bean
-    public Step step1() {
-        return new StepBuilder("csvImport", jobRepository)
-                .<JobDetails, JobDetails>chunk(1000, platformTransactionManager)
-                .reader(reader())
-                .processor(processor())
-                .writer(writer())
-                .taskExecutor(taskExecutor())
+    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("step1", jobRepository)
+                .tasklet(new SampleTasklet(), transactionManager)
                 .build();
     }
 
     @Bean
-    public Job runJob() {
+    public Job runJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new JobBuilder("importStudents", jobRepository)
-                .start(step1())
+                .start(step1(jobRepository, transactionManager))
                 .build();
 
     }
@@ -93,5 +88,20 @@ public class BatchConfig {
         lineMapper.setLineTokenizer(lineTokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
         return lineMapper;
+    }
+
+    /**
+     *
+     */
+    public class SampleTasklet implements Tasklet {
+
+
+        public RepeatStatus execute(StepContribution contribution,
+                                    ChunkContext chunkContext) throws Exception {
+
+            return RepeatStatus.FINISHED;
+        }
+
+
     }
 }

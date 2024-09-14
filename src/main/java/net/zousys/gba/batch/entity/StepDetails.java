@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class JobDetails {
+public class StepDetails {
 
     @Id
     @GeneratedValue
@@ -17,7 +17,7 @@ public class JobDetails {
     private String name;
     private String status;
     private String parameters;
-    private Integer batchJobId;
+    private Integer batchStepId;
     private String log;
     private String comments;
 
