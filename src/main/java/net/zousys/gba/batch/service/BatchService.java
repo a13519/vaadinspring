@@ -19,12 +19,13 @@ public class BatchService {
     private JobLauncher myJobLauncher;
     @Autowired
     private Job aJob;
-
+    @Autowired
+    private Job bJob;
     /**
      *
      * @param para
      */
-    public void runJob(String para) {
+    public void runJobA(String para) {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
                     .addString("ENV", para).toJobParameters();
@@ -35,6 +36,23 @@ public class BatchService {
             e.printStackTrace();
         }
     }
+
+    /**
+     *
+     * @param para
+     */
+    public void runJobB(String para) {
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addString("ENV", para).toJobParameters();
+            JobInstance jobInstance = jobExplorer.getJobInstance(bJob.getName(), jobParameters);
+
+            JobExecution jobExecution = myJobLauncher.run(bJob, jobParameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      *
      * @param name

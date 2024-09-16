@@ -23,6 +23,7 @@ public class JobListener implements JobExecutionListener {
                 .id(jobExecution.getJobId())
                 .name(jobExecution.getJobInstance().getJobName())
                 .log("xxx")
+                .parameters(jobExecution.getJobParameters().toString())
                 .status(jobExecution.getStatus().toString())
                 .batchJobExeId(jobExecution.getJobId())
                 .build();
@@ -34,7 +35,7 @@ public class JobListener implements JobExecutionListener {
      * @param jobExecution the current {@link JobExecution}
      */
     public void afterJob(JobExecution jobExecution) {
-        Optional<JobDetails> ojobDetails = jobDetailsRepository.findById(jobExecution.getId());
+        Optional<JobDetails> ojobDetails = jobDetailsRepository.findById(jobExecution.getJobId());
         JobDetails jobDetails = ojobDetails.get();
         if (jobDetails != null) {
             jobDetails.setStatus(jobExecution.getStatus().toString());
