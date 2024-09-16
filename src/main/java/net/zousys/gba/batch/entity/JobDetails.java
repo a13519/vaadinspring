@@ -1,10 +1,11 @@
 package net.zousys.gba.batch.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.domain.Auditable;
+
+import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 @Builder
 @Setter
@@ -13,7 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "job_details")
-public class JobDetails {
+public class JobDetails extends AuditModel {
 
     @Id
     private Long id;
@@ -23,6 +24,5 @@ public class JobDetails {
     private Long batchJobExeId;
     private String log;
     private String comments;
-
 
 }

@@ -1,17 +1,16 @@
 package net.zousys.gba.batch.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "step_details")
-public class StepDetails {
+public class StepDetails extends AuditModel {
 
     @Id
     private Long id;

@@ -55,6 +55,29 @@ public class BatchService {
 
     /**
      *
+     * @param executionId
+     * @return
+     */
+    public List<StepExecution> getStepExecutions(Long executionId) {
+        JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+        if (jobExecution != null) {
+            return jobExecution.getStepExecutions().stream().toList();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param jobExecutionId
+     * @param stepExecutionId
+     * @return
+     */
+    public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
+        return jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
+    }
+    /**
+     *
      * @param name
      * @return
      * @throws NoSuchJobException

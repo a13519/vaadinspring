@@ -5,7 +5,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -21,17 +20,27 @@ import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
-public class BatchB {
+public class BatchJobB {
 
     private final JobRepository jobRepository;
     private final DataSource dataSource;
     private final PlatformTransactionManager transactionManager;
     private final PlatformTransactionManager platformTransactionManager;
     private final JobListener jobListener;
+    private final StepListener stepListener;
+
     @Bean
     public Step stepb1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("batchB-Step1", jobRepository)
                 .tasklet(new SampleTaskletB(), transactionManager)
+                .listener(stepListener)
+                .build();
+    }
+    @Bean
+    public Step stepb2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("batchB-Step2", jobRepository)
+                .tasklet(new SampleTaskletB(), transactionManager)
+                .listener(stepListener)
                 .build();
     }
 
@@ -39,6 +48,7 @@ public class BatchB {
     public Job bJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new JobBuilder("BatchJob_B", jobRepository)
                 .start(stepb1(jobRepository, transactionManager))
+                .next(stepb2(jobRepository, transactionManager))
                 .listener(jobListener)
                 .build();
 
