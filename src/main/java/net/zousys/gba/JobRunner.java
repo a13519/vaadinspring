@@ -12,7 +12,7 @@ public class JobRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        batchService.runJob("S2");
+//        batchService.runJob("S2");
 //        batchService.runJob("S2");
     }
 }

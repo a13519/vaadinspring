@@ -2,7 +2,7 @@ package net.zousys.gba.batch.config;
 
 import lombok.RequiredArgsConstructor;
 import net.zousys.gba.batch.entity.JobDetails;
-import net.zousys.gba.batch.entity.JobDetailsRepository;
+import net.zousys.gba.batch.repository.JobDetailsRepository;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
@@ -30,8 +30,7 @@ public class BatchConfig {
     private final DataSource dataSource;
     private final PlatformTransactionManager transactionManager;
     private final PlatformTransactionManager platformTransactionManager;
-    private final JobDetailsRepository repository;
-
+    private final JobListener jobListener;
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("step1", jobRepository)
@@ -43,6 +42,7 @@ public class BatchConfig {
     public Job aJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new JobBuilder("importStudents", jobRepository)
                 .start(step1(jobRepository, transactionManager))
+                .listener(jobListener)
                 .build();
 
     }
@@ -77,40 +77,5 @@ public class BatchConfig {
         }
     }
 
-    /**
-     *
-     */
-    @Component
-    public static class JobListener implements JobExecutionListener {
-        @Autowired
-        private JobDetailsRepository jobDetailsRepository;
 
-        /**
-         *
-         * @param jobExecution the current {@link JobExecution}
-         */
-        public void beforeJob(JobExecution jobExecution) {
-            JobDetails jobDetails = JobDetails.builder()
-                    .id(jobExecution.getJobId())
-                    .name(jobExecution.getJobInstance().getJobName())
-                    .log("xxx")
-                    .status(jobExecution.getStatus().toString())
-                    .batchJobExeId(jobExecution.getJobId())
-                    .build();
-            jobDetailsRepository.save(jobDetails);
-        }
-
-        /**
-         *
-         * @param jobExecution the current {@link JobExecution}
-         */
-        public void afterJob(JobExecution jobExecution) {
-            Optional<JobDetails> ojobDetails = jobDetailsRepository.findById(jobExecution.getId());
-            JobDetails jobDetails = ojobDetails.get();
-            if (jobDetails != null) {
-                jobDetails.setStatus(jobExecution.getStatus().toString());
-                jobDetailsRepository.save(jobDetails);
-            }
-        }
-    }
 }

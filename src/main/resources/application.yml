@@ -9,13 +9,14 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
-    show-sql: false
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
 #    database: postgresql
     database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
   batch:
     jdbc:
       initialize-schema: ALWAYS
