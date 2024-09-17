@@ -1,6 +1,6 @@
 package net.zousys.gba;
 
-import net.zousys.gba.batch.service.BatchService;
+import net.zousys.gba.function.batch.service.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package net.zousys.gba.batch.service;
+package net.zousys.gba.function.batch.service;
 
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.explore.JobExplorer;

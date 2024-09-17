@@ -1,4 +1,4 @@
-package net.zousys.gba.batch.config;
+package net.zousys.gba.function.batch.config;
 
 import org.springframework.data.domain.AuditorAware;
 

@@ -3,7 +3,7 @@ package net.zousys.gba;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import net.zousys.gba.batch.service.BatchService;
+import net.zousys.gba.function.batch.service.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

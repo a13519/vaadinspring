@@ -1,11 +1,7 @@
-package net.zousys.gba.batch.entity;
+package net.zousys.gba.function.batch.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.domain.Auditable;
-
-import java.time.temporal.TemporalAccessor;
-import java.util.Optional;
 
 @Builder
 @Setter

@@ -3,7 +3,7 @@ package net.zousys.gba.security;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.server.auth.NavigationAccessControl;
-import net.zousys.gba.views.login.LoginView;
+import net.zousys.gba.ui.views.login.LoginView;
 
 public class NavigationAccessCheckerInitializer implements VaadinServiceInitListener {
 

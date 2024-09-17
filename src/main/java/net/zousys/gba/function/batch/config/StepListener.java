@@ -1,11 +1,8 @@
-package net.zousys.gba.batch.config;
+package net.zousys.gba.function.batch.config;
 
-import net.zousys.gba.batch.entity.JobDetails;
-import net.zousys.gba.batch.entity.StepDetails;
-import net.zousys.gba.batch.repository.JobDetailsRepository;
-import net.zousys.gba.batch.repository.StepDetailsRepository;
+import net.zousys.gba.function.batch.entity.StepDetails;
+import net.zousys.gba.function.batch.repository.StepDetailsRepository;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;

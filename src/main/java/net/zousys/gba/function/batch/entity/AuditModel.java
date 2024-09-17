@@ -1,4 +1,4 @@
-package net.zousys.gba.batch.entity;
+package net.zousys.gba.function.batch.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

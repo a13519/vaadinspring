@@ -1,7 +1,7 @@
-package net.zousys.gba.batch.config;
+package net.zousys.gba.function.batch.config;
 
-import net.zousys.gba.batch.entity.JobDetails;
-import net.zousys.gba.batch.repository.JobDetailsRepository;
+import net.zousys.gba.function.batch.entity.JobDetails;
+import net.zousys.gba.function.batch.repository.JobDetailsRepository;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package net.zousys.gba.views;
+package net.zousys.gba.ui;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -7,14 +7,10 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 import net.zousys.gba.security.SecurityService;
-
-import javax.swing.text.html.ListView;
+import net.zousys.gba.ui.views.alljobs.AllJobsView;
 
 
 public class MainLayout extends AppLayout{
@@ -44,14 +40,17 @@ public class MainLayout extends AppLayout{
     }
 
     private void createDrawer() {
+        RouterLink listLink = new RouterLink("Home", AllJobsView.class);
+        listLink.setHighlightCondition(HighlightConditions.sameLocation());
         addToDrawer(new VerticalLayout(
-            newListView()
+//            newListView()
+                listLink
         ));
     }
 
     private VerticalLayout newListView() {
         VerticalLayout vl = new VerticalLayout();
-        vl.add(new com.vaadin.flow.component.Text("This is private system, please don't try to login if you are not granted the access"));
+        vl.add(new com.vaadin.flow.component.Text("xxThis is private system, please don't try to login if you are not granted the access"));
         return vl;
     }
 }
