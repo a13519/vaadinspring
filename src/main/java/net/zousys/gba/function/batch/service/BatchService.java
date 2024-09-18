@@ -1,15 +1,19 @@
 package net.zousys.gba.function.batch.service;
 
+import net.zousys.gba.function.batch.dto.JobDTO;
+import net.zousys.gba.function.batch.entity.JobDetails;
+import net.zousys.gba.function.batch.repository.JobDetailsRepository;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class BatchService {
@@ -21,6 +25,9 @@ public class BatchService {
     private Job aJob;
     @Autowired
     private Job bJob;
+    @Autowired
+    private JobDetailsRepository jobDetailsRepository;
+
     /**
      *
      * @param para
@@ -105,4 +112,58 @@ public class BatchService {
         });
         return jexe;
     }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Optional<JobDTO> get(Long id) {
+        JobExecution jobExecution = jobExplorer.getJobExecution(id);
+        if (jobExecution != null) {
+            Optional<JobDetails> jobDetails = jobDetailsRepository.findById(id);
+            if (jobDetails.isPresent()) {
+                return Optional.of(JobDTO.builder()
+                        .id(jobExecution.getJobId())
+                        .name(jobDetails.get().getName())
+                        .status(jobDetails.get().getStatus())
+                        .started(jobExecution.getStartTime())
+                        .finished(jobExecution.getEndTime())
+                        .log(jobDetails.get().getLog())
+                        .build());
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     *
+     * @param pageable
+     * @return
+     */
+    public Collection<JobDTO> listAll(Pageable pageable) {
+        Page<JobDetails> list = jobDetailsRepository.findAll(pageable);
+
+        List<JobDTO> r = new ArrayList<>();
+        List<JobDetails> details = list.stream().toList();
+
+        for (JobDetails jobDetails : details) {
+            JobExecution jobExecution = jobExplorer.getJobExecution(jobDetails.getId());
+            JobDTO jobDTO = JobDTO.builder()
+                    .id(jobExecution.getJobId())
+                    .name(jobDetails.getName())
+                    .status(jobDetails.getStatus())
+                    .started(jobExecution.getStartTime())
+                    .finished(jobExecution.getEndTime())
+                    .log(jobDetails.getLog())
+                    .build();
+            r.add(jobDTO);
+        }
+        return r;
+    }
+
+//    public Page<JobDTO> list(Pageable pageable, Specification<JobDTO> filter) {
+//        return repository.findAll(filter, pageable);
+//    }
+
 }

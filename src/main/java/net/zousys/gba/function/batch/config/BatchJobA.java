@@ -57,7 +57,7 @@ public class BatchJobA {
     public static class SampleTaskletA implements Tasklet {
         public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(110000);
                 System.out.println("done...");
             } catch (Exception e){
                 e.printStackTrace();
