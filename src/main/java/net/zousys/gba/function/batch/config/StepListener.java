@@ -24,6 +24,7 @@ public class StepListener implements StepExecutionListener {
                 .log("ccc")
                 .status(stepExecution.getStatus().toString())
                 .batchStepId(stepExecution.getId())
+                .started(stepExecution.getStartTime())
                 .build();
         stepDetailsRepository.save(stepDetails);
         System.out.println("Before Step: " + stepExecution.getStepName());
@@ -36,6 +37,7 @@ public class StepListener implements StepExecutionListener {
         StepDetails stepDetails = ostepDetails.get();
         if (stepDetails != null) {
             stepDetails.setStatus(stepExecution.getStatus().toString());
+            stepDetails.setEnded(stepExecution.getEndTime());
             stepDetailsRepository.save(stepDetails);
         }
         return stepExecution.getExitStatus(); // Return the same or modify ExitStatus

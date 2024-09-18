@@ -31,7 +31,8 @@ public class JobListener implements JobExecutionListener {
 //                .log("xxx")
                 .parameters(jobExecution.getJobParameters().toString())
                 .status(jobExecution.getStatus().toString())
-                .batchJobExeId(jobExecution.getJobId())
+                .batchJobId(jobExecution.getJobId())
+                .started(jobExecution.getStartTime())
                 .build();
         jobDetails.setUsername(username);
         jobDetails.setAuthority(authorities);
@@ -47,6 +48,7 @@ public class JobListener implements JobExecutionListener {
         JobDetails jobDetails = ojobDetails.get();
         if (jobDetails != null) {
             jobDetails.setStatus(jobExecution.getStatus().toString());
+            jobDetails.setEnded(jobExecution.getEndTime());
             jobDetailsRepository.save(jobDetails);
         }
     }

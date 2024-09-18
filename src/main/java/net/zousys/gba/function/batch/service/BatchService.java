@@ -10,7 +10,6 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -128,7 +127,7 @@ public class BatchService {
                         .name(jobDetails.get().getName())
                         .status(jobDetails.get().getStatus())
                         .started(jobExecution.getStartTime())
-                        .finished(jobExecution.getEndTime())
+                        .ended(jobExecution.getEndTime())
                         .log(jobDetails.get().getLog())
                         .build());
             }
@@ -141,23 +140,13 @@ public class BatchService {
      * @param pageable
      * @return
      */
-    public Collection<JobDTO> listAll(Pageable pageable) {
+    public List<JobDTO> listAll(Pageable pageable) {
         Page<JobDetails> list = jobDetailsRepository.findAll(pageable);
-
         List<JobDTO> r = new ArrayList<>();
         List<JobDetails> details = list.stream().toList();
 
         for (JobDetails jobDetails : details) {
-            JobExecution jobExecution = jobExplorer.getJobExecution(jobDetails.getId());
-            JobDTO jobDTO = JobDTO.builder()
-                    .id(jobExecution.getJobId())
-                    .name(jobDetails.getName())
-                    .status(jobDetails.getStatus())
-                    .started(jobExecution.getStartTime())
-                    .finished(jobExecution.getEndTime())
-                    .log(jobDetails.getLog())
-                    .build();
-            r.add(jobDTO);
+            r.add(jobDetails.convertToDTO());
         }
         return r;
     }
@@ -166,4 +155,8 @@ public class BatchService {
 //        return repository.findAll(filter, pageable);
 //    }
 
+    public int countEntities() {
+        // Return the total count of entities
+        return (int) jobDetailsRepository.count();
+    }
 }

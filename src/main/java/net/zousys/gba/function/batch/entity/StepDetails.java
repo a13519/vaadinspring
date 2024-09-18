@@ -2,6 +2,9 @@ package net.zousys.gba.function.batch.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.zousys.gba.function.batch.dto.StepDTO;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -20,5 +23,18 @@ public class StepDetails extends AuditModel {
     private Long batchStepId;
     private String log;
     private String comments;
+    private LocalDateTime started;
+    private LocalDateTime ended;
 
+    public StepDTO convertToDTO() {
+        return StepDTO.builder()
+                .id(getId())
+                .name(getName())
+                .status(getStatus())
+                .started(getStarted())
+                .ended(getEnded())
+                .log(getLog())
+                .parameters(getParameters())
+                .build();
+    }
 }

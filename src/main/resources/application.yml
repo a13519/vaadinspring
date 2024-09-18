@@ -15,7 +15,7 @@ spring:
         format_sql: true
 #    database: postgresql
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
+    show-sql: false
 
   batch:
     jdbc:

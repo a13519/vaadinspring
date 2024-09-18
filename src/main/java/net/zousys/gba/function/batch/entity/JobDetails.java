@@ -2,6 +2,9 @@ package net.zousys.gba.function.batch.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.zousys.gba.function.batch.dto.JobDTO;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Setter
@@ -17,8 +20,21 @@ public class JobDetails extends AuditModel {
     private String name;
     private String status;
     private String parameters;
-    private Long batchJobExeId;
+    private Long batchJobId;
     private String log;
     private String comments;
+    private LocalDateTime started;
+    private LocalDateTime ended;
 
+    public JobDTO convertToDTO() {
+        return JobDTO.builder()
+                .id(getId())
+                .name(getName())
+                .status(getStatus())
+                .started(getStarted())
+                .ended(getEnded())
+                .log(getLog())
+                .parameters(getParameters())
+                .build();
+    }
 }
