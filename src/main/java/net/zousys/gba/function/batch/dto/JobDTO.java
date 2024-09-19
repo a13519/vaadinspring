@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class JobDTO {
     private Long id;
+    private Long jobId;
     private String name;
     private String status;
     private String parameters;

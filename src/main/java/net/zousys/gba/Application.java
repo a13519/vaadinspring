@@ -38,7 +38,7 @@ public class Application  implements AppShellConfigurator, CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        batchService.runJobA("Sa2"+System.currentTimeMillis());
-        batchService.runJobB("Sb2"+System.currentTimeMillis());
+        batchService.runJobA("Sa2");
+        batchService.runJobB("Sb2");
     }
 }

@@ -26,12 +26,12 @@ public class JobListener implements JobExecutionListener {
         String authorities = authentication==null?"":authentication.getAuthorities().toString()+"";
 
         JobDetails jobDetails = JobDetails.builder()
-                .id(jobExecution.getJobId())
+                .id(jobExecution.getId())
+                .batchJobId(jobExecution.getJobInstance().getInstanceId())
                 .name(jobExecution.getJobInstance().getJobName())
 //                .log("xxx")
                 .parameters(jobExecution.getJobParameters().toString())
                 .status(jobExecution.getStatus().toString())
-                .batchJobId(jobExecution.getJobId())
                 .started(jobExecution.getStartTime())
                 .build();
         jobDetails.setUsername(username);

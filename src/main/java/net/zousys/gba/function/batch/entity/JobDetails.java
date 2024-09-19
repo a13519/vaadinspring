@@ -29,6 +29,7 @@ public class JobDetails extends AuditModel {
     public JobDTO convertToDTO() {
         return JobDTO.builder()
                 .id(getId())
+                .jobId(getBatchJobId())
                 .name(getName())
                 .status(getStatus())
                 .started(getStarted())
