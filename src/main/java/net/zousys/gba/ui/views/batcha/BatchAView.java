@@ -276,19 +276,12 @@ public class BatchAView extends Composite<VerticalLayout> {
      *
      */
     private void startAutoRefresh() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // Use UI.access() to update the UI from a background thread
-                if (UI.getCurrent()!=null) {
-                    UI.getCurrent().access(() -> {
-                        loadPage(page);
-                        UI.getCurrent().push();  // Push updates to the client
-                    });
-                }
-            }
-        }, 0, 10000);  // Update every 5 seconds
+        UI myUI = UI.getCurrent();
+
+        myUI.setPollInterval(300000);
+        myUI.addPollListener(event -> {
+            loadPage(page);
+        });// Update every 5 seconds
     }
 
     /**
