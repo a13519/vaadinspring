@@ -21,6 +21,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -32,6 +33,9 @@ import net.zousys.gba.ui.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,20 +75,24 @@ public class AllJobsView extends Composite<VerticalLayout> {
         rowLayout.setJustifyContentMode(HorizontalLayout.JustifyContentMode.BETWEEN);
 
         stripedGrid = new Grid(JobDTO.class, false);
-        stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true);
-        stripedGrid.addColumn("name");
-        stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true);
-        stripedGrid.addColumn("parameters");
-        stripedGrid.addColumn("started").setSortable(true);
-        stripedGrid.addColumn("ended").setSortable(true);
-        stripedGrid.addColumn("status").setSortable(true);
-//        stripedGrid.addColumn(createToggleDetailsRenderer(stripedGrid));
+        stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true).setWidth("6rem");
+        stripedGrid.addColumn("name").setWidth("9rem");
+        stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true).setWidth("6rem");
+        stripedGrid.addColumn("parameters").setWidth("18rem");
+//        stripedGrid.addColumn("started").setSortable(true);
+        stripedGrid.addColumn(new LocalDateTimeRenderer<>(
+                        JobDTO::getStarted, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
+                .setHeader("Started").setWidth("12rem");
+        stripedGrid.addColumn(new LocalDateTimeRenderer<>(
+                        JobDTO::getEnded, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,                         FormatStyle.MEDIUM)))
+                .setHeader("Ended").setWidth("12rem");
+        stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
+
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
-            Button button = new Button("Show Details");
+            Button button = new Button("Details");
             button.addClickListener(event -> openPopup(item));  // Open popup on button click
             return button;
         })).setHeader("Actions");
-
 
         stripedGrid.setDetailsVisibleOnClick(false);
         stripedGrid.setItemDetailsRenderer(createPersonDetailsRenderer());

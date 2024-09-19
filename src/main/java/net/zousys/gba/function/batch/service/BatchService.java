@@ -45,7 +45,7 @@ public class BatchService {
      *
      * @param para
      */
-    public int runJobA(String para) {
+    public Long runJobA(String para) {
         try {
             if (!isRunning("BatchJob_A")) {
                 JobParameters jobParameters = new JobParametersBuilder()
@@ -54,22 +54,22 @@ public class BatchService {
                         .toJobParameters();
                 JobInstance jobInstance = jobExplorer.getJobInstance(aJob.getName(), jobParameters);
                 JobExecution jobExecution = asyncJobLauncher.run(aJob, jobParameters);
-                return 0;
+                return jobExecution.getId();
             } else {
                 System.out.println("Job BatchJob_A is running");
-                return 1;
+                return 0L;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return -1;
+        return -1L;
     }
 
     /**
      *
      * @param para
      */
-    public int runJobB(String para) {
+    public Long runJobB(String para) {
         try {
             if (!isRunning("BatchJob_B")) {
                 JobParameters jobParameters = new JobParametersBuilder()
@@ -78,15 +78,15 @@ public class BatchService {
                         .toJobParameters();
                 JobInstance jobInstance = jobExplorer.getJobInstance(bJob.getName(), jobParameters);
                 JobExecution jobExecution = asyncJobLauncher.run(bJob, jobParameters);
-                return 0;
+                return jobExecution.getId();
             } else {
                 System.out.println("Job BatchJob_B is running");
-                return 1;
+                return 0L;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return -1;
+        return -1L;
     }
 
     /**

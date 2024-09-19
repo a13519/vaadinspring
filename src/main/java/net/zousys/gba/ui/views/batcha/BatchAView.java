@@ -1,5 +1,6 @@
 package net.zousys.gba.ui.views.batcha;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -23,9 +24,8 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.renderer.*;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -41,8 +41,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Stream;
@@ -60,6 +64,7 @@ public class BatchAView extends Composite<VerticalLayout> {
     private Grid<JobDTO> stripedGrid;
     private Sort sort = Sort.by("id").descending();
     private Text h6;
+    private HorizontalLayout rowLayout;
     /**
      *
      */
@@ -76,22 +81,27 @@ public class BatchAView extends Composite<VerticalLayout> {
         paginationLayout.setWidthFull();  // Set layout to full width
         paginationLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);  // Align to the right
 
-        HorizontalLayout rowLayout = new HorizontalLayout(textContainer, paginationLayout);
+        rowLayout = new HorizontalLayout(textContainer, paginationLayout);
         rowLayout.setWidthFull();
         // Align one element to the left and another to the right
         rowLayout.setJustifyContentMode(HorizontalLayout.JustifyContentMode.BETWEEN);
 
         stripedGrid = new Grid(JobDTO.class, false);
-        stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true);
-        stripedGrid.addColumn("name");
-        stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true);
-        stripedGrid.addColumn("parameters");
-        stripedGrid.addColumn("started").setSortable(true);
-        stripedGrid.addColumn("ended").setSortable(true);
-        stripedGrid.addColumn("status").setSortable(true);
-//        stripedGrid.addColumn(createToggleDetailsRenderer(stripedGrid));
+        stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true).setWidth("6rem");
+        stripedGrid.addColumn("name").setWidth("9rem");
+        stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true).setWidth("6rem");
+        stripedGrid.addColumn("parameters").setWidth("18rem");
+//        stripedGrid.addColumn("started").setSortable(true);
+        stripedGrid.addColumn(new LocalDateTimeRenderer<>(
+                        JobDTO::getStarted, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
+                .setHeader("Started").setWidth("12rem");
+        stripedGrid.addColumn(new LocalDateTimeRenderer<>(
+                        JobDTO::getEnded, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,                         FormatStyle.MEDIUM)))
+                .setHeader("Ended").setWidth("12rem");
+        stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
+
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
-            Button button = new Button("Show Details");
+            Button button = new Button("Details");
             button.addClickListener(event -> openPopup(item));  // Open popup on button click
             return button;
         })).setHeader("Actions");
@@ -116,7 +126,7 @@ public class BatchAView extends Composite<VerticalLayout> {
 
         getContent().add(tabs);
         getContent().add(stripedGrid, rowLayout);
-        startAutoRefresh();
+
 //        loadPage(page);
     }
 
@@ -265,24 +275,26 @@ public class BatchAView extends Composite<VerticalLayout> {
         dialogLayout.add(buttonLayout);
 
         runButton.addClickListener(a->{
-            run(envs.getValue(), directory.getValue(), dateTimePicker.getValue());
-            dialog.close();
-            navigatePage(-0);
+            InfoDialog.openConfirmation("Run Job", "Are you sure to run this job?"
+            ,"Cancel", "Yes", null, event -> {
+                        run(envs.getValue(), directory.getValue(), dateTimePicker.getValue());
+                        dialog.close();
+                        navigatePage(-0);
+            });
+//            startAutoRefresh();
         });
         dialog.open();
     }
 
-    /**
-     *
-     */
-    private void startAutoRefresh() {
-        UI myUI = UI.getCurrent();
-
-        myUI.setPollInterval(300000);
-        myUI.addPollListener(event -> {
-            loadPage(page);
-        });// Update every 5 seconds
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+//        rowLayout.add(new Span("Waiting for updates"));
+        // Start the data feed thread
+        FeederThread thread = new FeederThread(attachEvent.getUI(), this);
+        thread.start();
     }
+
+
 
     /**
      *
@@ -294,11 +306,44 @@ public class BatchAView extends Composite<VerticalLayout> {
 //        ProgressBar progressBar = new ProgressBar();
 //        progressBar.setIndeterminate(true);
 
-        int r = batchService.runJobA(env);
-        if (r==0) {
-            InfoDialog.openInfo("Info", "<div>The job is triggered</div>");
-        } else if (r==1) {
+        Long r = batchService.runJobA(env);
+        if (r>0) {
+            InfoDialog.openInfo("Info", "<div>The job is triggered as ID "+r+"</div>");
+        } else if (r==0) {
             InfoDialog.openInfo("Info", "<div>The previous job has not finished</div>");
         }
     }
+
+
+    private static class FeederThread extends Thread {
+        private final UI ui;
+        private final BatchAView view;
+
+        private int count = 0;
+
+        public FeederThread(UI ui, BatchAView view) {
+            this.ui = ui;
+            this.view = view;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                // Update the data for a while
+                while (count < 10) {
+//                    System.out.println("RRRRR");
+                    // Sleep to emulate background work
+                    Thread.sleep(30000);
+                    String message = "This is update " + count++;
+
+                    ui.access(() -> view.loadPage(view.page));
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
