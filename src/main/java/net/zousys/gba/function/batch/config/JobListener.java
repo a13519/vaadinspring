@@ -51,5 +51,6 @@ public class JobListener implements JobExecutionListener {
             jobDetails.setEnded(jobExecution.getEndTime());
             jobDetailsRepository.save(jobDetails);
         }
+        System.out.println("*** updated "+jobExecution.getJobInstance().getJobName()+" "+jobExecution.getJobId());
     }
 }

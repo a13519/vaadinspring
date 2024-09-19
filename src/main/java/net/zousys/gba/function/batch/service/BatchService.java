@@ -19,7 +19,7 @@ public class BatchService {
     @Autowired
     private JobExplorer jobExplorer;
     @Autowired
-    private JobLauncher myJobLauncher;
+    private JobLauncher asyncJobLauncher;
     @Autowired
     private Job aJob;
     @Autowired
@@ -29,34 +29,64 @@ public class BatchService {
 
     /**
      *
-     * @param para
+     * @param name
+     * @return
      */
-    public void runJobA(String para) {
-        try {
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("ENV", para).toJobParameters();
-            JobInstance jobInstance = jobExplorer.getJobInstance(aJob.getName(), jobParameters);
-
-            JobExecution jobExecution = myJobLauncher.run(aJob, jobParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private boolean isRunning(String name) {
+        JobInstance jobInstance = jobExplorer.getLastJobInstance(name);
+        if (jobInstance == null) {
+            return false;
         }
+        JobExecution jobExecution = jobExplorer.getJobExecution(jobInstance.getId());
+        return jobExecution.isRunning();
     }
 
     /**
      *
      * @param para
      */
-    public void runJobB(String para) {
+    public int runJobA(String para) {
         try {
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("ENV", para).toJobParameters();
-            JobInstance jobInstance = jobExplorer.getJobInstance(bJob.getName(), jobParameters);
-
-            JobExecution jobExecution = myJobLauncher.run(bJob, jobParameters);
+            if (!isRunning("BatchJob_A")) {
+                JobParameters jobParameters = new JobParametersBuilder()
+                        .addString("ENV", para)
+                        .addString("Created", "" + System.currentTimeMillis())
+                        .toJobParameters();
+                JobInstance jobInstance = jobExplorer.getJobInstance(aJob.getName(), jobParameters);
+                JobExecution jobExecution = asyncJobLauncher.run(aJob, jobParameters);
+                return 0;
+            } else {
+                System.out.println("Job BatchJob_A is running");
+                return 1;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return -1;
+    }
+
+    /**
+     *
+     * @param para
+     */
+    public int runJobB(String para) {
+        try {
+            if (!isRunning("BatchJob_B")) {
+                JobParameters jobParameters = new JobParametersBuilder()
+                        .addString("ENV", para)
+                        .addString("Created", "" + System.currentTimeMillis())
+                        .toJobParameters();
+                JobInstance jobInstance = jobExplorer.getJobInstance(bJob.getName(), jobParameters);
+                JobExecution jobExecution = asyncJobLauncher.run(bJob, jobParameters);
+                return 0;
+            } else {
+                System.out.println("Job BatchJob_B is running");
+                return 1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**
@@ -151,6 +181,24 @@ public class BatchService {
         return r;
     }
 
+    /**
+     *
+     * @param name
+     * @param pageable
+     * @return
+     */
+    public List<JobDTO> listByName(String name, Pageable pageable) {
+        Page<JobDetails> list = jobDetailsRepository.findByName(name, pageable);
+        List<JobDTO> r = new ArrayList<>();
+        List<JobDetails> details = list.stream().toList();
+
+        for (JobDetails jobDetails : details) {
+            r.add(jobDetails.convertToDTO());
+        }
+        return r;
+    }
+
+
 //    public Page<JobDTO> list(Pageable pageable, Specification<JobDTO> filter) {
 //        return repository.findAll(filter, pageable);
 //    }
@@ -158,5 +206,10 @@ public class BatchService {
     public int countEntities() {
         // Return the total count of entities
         return (int) jobDetailsRepository.count();
+    }
+
+    public int countEntities(String name) {
+        // Return the total count of entities
+        return (int) jobDetailsRepository.countByName(name);
     }
 }

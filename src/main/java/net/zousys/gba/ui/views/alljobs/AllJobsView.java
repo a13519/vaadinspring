@@ -2,6 +2,7 @@ package net.zousys.gba.ui.views.alljobs;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -9,7 +10,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -31,10 +31,10 @@ import net.zousys.gba.function.batch.service.BatchService;
 import net.zousys.gba.ui.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Stream;
 
 @PageTitle("All Jobs")
@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 @Uses(Icon.class)
 @PermitAll
 public class AllJobsView extends Composite<VerticalLayout> {
-
     @Autowired()
     private BatchService batchService;
     private int page = 0;
@@ -108,11 +107,12 @@ public class AllJobsView extends Composite<VerticalLayout> {
         getContent().add(tabs);
         getContent().add(stripedGrid, rowLayout);
 //        loadPage(page);
+        startAutoRefresh();
     }
 
     private void setTabsSampleData(Tabs tabs) {
         tabs.add(new Tab("History"));
-        tabs.add(new Tab("Run A Job"));
+//        tabs.add(new Tab("Run A Job"));
     }
 
     private void setJobGridData(Grid grid) {
@@ -160,6 +160,17 @@ public class AllJobsView extends Composite<VerticalLayout> {
                 JobDetailsFormLayout::setJob);
     }
 
+    /**
+     *
+     */
+    private void startAutoRefresh() {
+        UI myUI = UI.getCurrent();
+
+//        myUI.setPollInterval(300000);
+//        myUI.addPollListener(event -> {
+//            loadPage(page);
+//        });// Update every 5 seconds
+    }
 
     private static class JobDetailsFormLayout extends FormLayout {
         private final TextField exeid = new TextField("Exe Id");
