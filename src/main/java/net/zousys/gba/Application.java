@@ -21,14 +21,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 @SpringBootApplication(
     exclude = ErrorMvcAutoConfiguration.class)
-@Theme(value = "my-app", variant = Lumo.DARK)
+
 //@EntityScan(basePackages = {
 //        "net.zousys.gbs.entity"
 //})
 //@EnableJpaRepositories(basePackages = {
 //        "net.zousys.gbs.repository"
 //})
-public class Application  implements AppShellConfigurator, CommandLineRunner {
+public class Application  implements CommandLineRunner {
     @Autowired
     private BatchService batchService;
 

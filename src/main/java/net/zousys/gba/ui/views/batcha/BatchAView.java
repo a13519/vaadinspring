@@ -14,6 +14,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -35,6 +36,7 @@ import net.zousys.gba.function.batch.dto.JobDTO;
 import net.zousys.gba.function.batch.service.BatchService;
 import net.zousys.gba.ui.MainLayout;
 import net.zousys.gba.ui.views.InfoDialog;
+import net.zousys.gba.ui.views.LogPanel;
 import net.zousys.gba.ui.views.alljobs.AllJobsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -73,17 +75,16 @@ public class BatchAView extends Composite<VerticalLayout> {
         Button refreshButton = new Button("Refresh", e -> navigatePage(-0));
         Button prevButton = new Button("Previous", e -> navigatePage(-1));
         h6 = new Text("Page 0");
-        Div textContainer = new Div(h6);
-        textContainer.setWidth("150px");
+        Div texth6 = new Div(h6);
+        texth6.setWidth("150px");
         Button runButton = new Button("Run", e -> openRunDialog());
         Button nextButton = new Button("Next", e -> navigatePage(1));
         HorizontalLayout paginationLayout = new HorizontalLayout(runButton, refreshButton, prevButton, nextButton);
         paginationLayout.setWidthFull();  // Set layout to full width
         paginationLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);  // Align to the right
 
-        rowLayout = new HorizontalLayout(textContainer, paginationLayout);
+        rowLayout = new HorizontalLayout(texth6, paginationLayout);
         rowLayout.setWidthFull();
-        // Align one element to the left and another to the right
         rowLayout.setJustifyContentMode(HorizontalLayout.JustifyContentMode.BETWEEN);
 
         stripedGrid = new Grid(JobDTO.class, false);
@@ -101,10 +102,19 @@ public class BatchAView extends Composite<VerticalLayout> {
         stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
 
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
-            Button button = new Button("Details");
-            button.addClickListener(event -> openPopup(item));  // Open popup on button click
+            Button button = new Button(VaadinIcon.GRID_SMALL.create());
+            button.addClickListener(event -> openPopup(item));  // Ope
             return button;
-        })).setHeader("Actions");
+        })).setHeader("Details");
+
+        stripedGrid.addColumn(new ComponentRenderer<>(item -> {
+            Button button = new Button(VaadinIcon.GLASSES.create());
+            button.addClickListener(event -> {
+                LogPanel lp = new LogPanel(item.getLog());
+                lp.show();
+            });  // Ope
+            return button;
+        })).setHeader("Log");
 
         stripedGrid.setDetailsVisibleOnClick(false);
         stripedGrid.setItemDetailsRenderer(createPersonDetailsRenderer());

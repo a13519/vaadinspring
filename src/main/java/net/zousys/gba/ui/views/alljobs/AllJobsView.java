@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -89,10 +90,16 @@ public class AllJobsView extends Composite<VerticalLayout> {
         stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
 
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
-            Button button = new Button("Details");
-            button.addClickListener(event -> openPopup(item));  // Open popup on button click
+            Button button = new Button(VaadinIcon.GRID_SMALL.create());
+            button.addClickListener(event -> openPopup(item));  // Ope
             return button;
-        })).setHeader("Actions");
+        })).setHeader("Details");
+
+        stripedGrid.addColumn(new ComponentRenderer<>(item -> {
+            Button button = new Button(VaadinIcon.GLASSES.create());
+            button.addClickListener(event -> openPopup(item));  // Ope
+            return button;
+        })).setHeader("Log");
 
         stripedGrid.setDetailsVisibleOnClick(false);
         stripedGrid.setItemDetailsRenderer(createPersonDetailsRenderer());

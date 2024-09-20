@@ -35,4 +35,6 @@ vaadin:
   # To improve the performance during development.
   # For more information https://vaadin.com/docs/latest/integrations/spring/configuration#special-configuration-parameters
   allowed-packages: com.vaadin,org.vaadin,net.zousys.gba
-
+  push:
+    enabled: true
+    mode: automatic
