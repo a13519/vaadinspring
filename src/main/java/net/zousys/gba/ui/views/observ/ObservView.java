@@ -1,17 +1,16 @@
-package net.zousys.gba.ui.views.alljobs;
+package net.zousys.gba.ui.views.observ;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -28,11 +27,11 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import net.zousys.gba.function.batch.dto.JobDTO;
-import net.zousys.gba.function.batch.service.BatchService;
+import net.zousys.gba.function.observable.dto.ObservDTO;
+import net.zousys.gba.function.observable.service.ObservService;
 import net.zousys.gba.ui.MainLayout;
+import net.zousys.gba.ui.views.LogPanel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.time.format.DateTimeFormatter;
@@ -40,50 +39,50 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.stream.Stream;
 
-@PageTitle("All Jobs")
-@Menu(icon = "line-awesome/svg/angle-double-down-solid.svg", order = 0)
-@Route(value = "all-jobs", layout = MainLayout.class)
-@Uses(Icon.class)
 @PermitAll
-public class AllJobsView extends Composite<VerticalLayout> {
+@PageTitle("Observables View")
+@Menu(icon = "line-awesome/svg/play-circle-solid.svg", order = 1)
+@Route(value = "observables", layout = MainLayout.class)
+public class ObservView extends Composite<VerticalLayout> {
+    public static final String JOBNAME="BatchJob_A";
     @Autowired()
-    private BatchService batchService;
+    private ObservService observService;
     private int page = 0;
     private final int size = 16;
-    private Grid<JobDTO> stripedGrid;
+    private Grid<ObservDTO> stripedGrid;
     private Sort sort = Sort.by("id").descending();
     private Text h6;
+    private HorizontalLayout rowLayout;
     /**
      *
      */
-    public AllJobsView() {
+    public ObservView() {
         Tabs tabs = new Tabs();
         Button refreshButton = new Button("Refresh", e -> navigatePage(-0));
         Button prevButton = new Button("Previous", e -> navigatePage(-1));
         h6 = new Text("Page 0");
-        Div textContainer = new Div(h6);
-        textContainer.setWidth("150px");
+        Div texth6 = new Div(h6);
+        texth6.setWidth("150px");
         Button nextButton = new Button("Next", e -> navigatePage(1));
         HorizontalLayout paginationLayout = new HorizontalLayout(refreshButton, prevButton, nextButton);
         paginationLayout.setWidthFull();  // Set layout to full width
         paginationLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);  // Align to the right
 
-        HorizontalLayout rowLayout = new HorizontalLayout(textContainer, paginationLayout);
+        rowLayout = new HorizontalLayout(texth6, paginationLayout);
         rowLayout.setWidthFull();
-        // Align one element to the left and another to the right
         rowLayout.setJustifyContentMode(HorizontalLayout.JustifyContentMode.BETWEEN);
 
-        stripedGrid = new Grid(JobDTO.class, false);
+        stripedGrid = new Grid(ObservDTO.class, false);
         stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true).setWidth("6rem");
         stripedGrid.addColumn("name").setWidth("9rem");
         stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true).setWidth("6rem");
         stripedGrid.addColumn("parameters").setWidth("18rem");
 //        stripedGrid.addColumn("started").setSortable(true);
         stripedGrid.addColumn(new LocalDateTimeRenderer<>(
-                        JobDTO::getStarted, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
+                        ObservDTO::getStarted, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
                 .setHeader("Started").setWidth("12rem");
         stripedGrid.addColumn(new LocalDateTimeRenderer<>(
-                        JobDTO::getEnded, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,                         FormatStyle.MEDIUM)))
+                        ObservDTO::getEnded, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,                         FormatStyle.MEDIUM)))
                 .setHeader("Ended").setWidth("12rem");
         stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
 
@@ -95,7 +94,10 @@ public class AllJobsView extends Composite<VerticalLayout> {
 
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
             Button button = new Button(VaadinIcon.GLASSES.create());
-            button.addClickListener(event -> openPopup(item));  // Ope
+            button.addClickListener(event -> {
+                LogPanel lp = new LogPanel(item.getLog());
+                lp.show();
+            });  // Ope
             return button;
         })).setHeader("Log");
 
@@ -115,12 +117,12 @@ public class AllJobsView extends Composite<VerticalLayout> {
 //        stripedGr
         stripedGrid.getStyle().set("flex-grow", "0");
 
-        setJobGridData(stripedGrid);
+        setGridData(stripedGrid);
 
         getContent().add(tabs);
         getContent().add(stripedGrid, rowLayout);
+
 //        loadPage(page);
-        startAutoRefresh();
     }
 
     private void setTabsSampleData(Tabs tabs) {
@@ -128,27 +130,27 @@ public class AllJobsView extends Composite<VerticalLayout> {
 //        tabs.add(new Tab("Run A Job"));
     }
 
-    private void setJobGridData(Grid grid) {
+    private void setGridData(Grid grid) {
 
         // Set up the data provider for pagination
-        DataProvider<JobDTO, Void> dataProvider = DataProvider.fromCallbacks(
+        DataProvider<ObservDTO, Void> dataProvider = DataProvider.fromCallbacks(
                 // Fetch data based on page size and offset
                 query -> {
                     int offset = query.getOffset();  // Starting point (row number)
                     int limit = query.getLimit();    // Number of items to fetch (page size)
                     h6.setText("Page "+offset/limit);
                     page = offset/limit;
-                    return batchService.listAll(PageRequest.of(offset/limit, limit, sort)).stream();
+                    return observService.retrieveObservs(JOBNAME).stream();
                 },
                 // Count the total number of entities (for grid sizing)
-                query -> batchService.countEntities()
+                query -> observService.countEntities(JOBNAME)
         );
 
         grid.setDataProvider(dataProvider);
     }
 
     private void loadPage(int pageNumber) {
-        List<JobDTO> entities = batchService.listAll(PageRequest.of(pageNumber, size, sort));
+        List<ObservDTO> entities = observService.retrieveObservs(JOBNAME);
         stripedGrid.setItems(entities);
     }
 
@@ -159,31 +161,20 @@ public class AllJobsView extends Composite<VerticalLayout> {
         loadPage(page);
     }
 
-    private static Renderer<JobDTO> createToggleDetailsRenderer(
-            Grid<JobDTO> grid) {
-        return LitRenderer.<JobDTO> of(
+    private static Renderer<ObservDTO> createToggleDetailsRenderer(
+            Grid<ObservDTO> grid) {
+        return LitRenderer.<ObservDTO> of(
                         "<vaadin-button theme=\"tertiary\" @click=\"${handleClick}\">Toggle details</vaadin-button>")
                 .withFunction("handleClick",
                         item -> grid.setDetailsVisible(item,
                                 !grid.isDetailsVisible(item)));
     }
 
-    private static ComponentRenderer<JobDetailsFormLayout, JobDTO> createPersonDetailsRenderer() {
+    private static ComponentRenderer<JobDetailsFormLayout, ObservDTO> createPersonDetailsRenderer() {
         return new ComponentRenderer<>(JobDetailsFormLayout::new,
                 JobDetailsFormLayout::setJob);
     }
 
-    /**
-     *
-     */
-    private void startAutoRefresh() {
-        UI myUI = UI.getCurrent();
-
-//        myUI.setPollInterval(300000);
-//        myUI.addPollListener(event -> {
-//            loadPage(page);
-//        });// Update every 5 seconds
-    }
 
     private static class JobDetailsFormLayout extends FormLayout {
         private final TextField exeid = new TextField("Exe Id");
@@ -205,7 +196,7 @@ public class AllJobsView extends Composite<VerticalLayout> {
             setColspan(ended, 3);
         }
 
-        public void setJob(JobDTO job) {
+        public void setJob(ObservDTO job) {
             exeid.setValue(""+job.getId());
             name.setValue(job.getName());
             parameter.setValue(job.getParameters());
@@ -215,7 +206,7 @@ public class AllJobsView extends Composite<VerticalLayout> {
         }
     }
 
-    private void openPopup(JobDTO item) {
+    private void openPopup(ObservDTO item) {
         Dialog dialog = new Dialog();
 
         // Add content to the dialog
@@ -234,6 +225,46 @@ public class AllJobsView extends Composite<VerticalLayout> {
         // Add the layout to the dialog and open it
         dialog.add(layout);
         dialog.open();
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+//        rowLayout.add(new Span("Waiting for updates"));
+        // Start the data feed thread
+        FeederThread thread = new FeederThread(attachEvent.getUI(), this);
+        thread.start();
+    }
+
+
+    private static class FeederThread extends Thread {
+        private final UI ui;
+        private final ObservView view;
+
+        private int count = 0;
+
+        public FeederThread(UI ui, ObservView view) {
+            this.ui = ui;
+            this.view = view;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                // Update the data for a while
+                while (count < 10) {
+//                    System.out.println("RRRRR");
+                    // Sleep to emulate background work
+                    Thread.sleep(30000);
+                    String message = "This is update " + count++;
+
+                    ui.access(() -> view.loadPage(view.page));
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

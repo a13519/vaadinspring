@@ -1,6 +1,8 @@
 package net.zousys.gba.function.batch.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 import net.zousys.gba.function.batch.dto.JobDTO;
 

@@ -1,17 +1,9 @@
 package net.zousys.gba.security;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.HandlerHelper;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.shared.ApplicationConstants;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.stream.Stream;
 
 public class SecurityUtils {
 

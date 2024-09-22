@@ -2,7 +2,6 @@ package net.zousys.gba.ui.views;
 
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Span;
 

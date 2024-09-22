@@ -10,10 +10,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.shared.communication.PushMode;
-import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.io.File;
