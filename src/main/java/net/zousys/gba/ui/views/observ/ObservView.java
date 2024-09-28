@@ -34,6 +34,7 @@ import net.zousys.gba.ui.views.LogPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -75,8 +76,10 @@ public class ObservView extends Composite<VerticalLayout> {
         stripedGrid = new Grid(ObservDTO.class, false);
         stripedGrid.addColumn("id").setHeader("Exe Id").setSortable(true).setWidth("6rem");
         stripedGrid.addColumn("name").setWidth("9rem");
-        stripedGrid.addColumn("jobId").setHeader("Job Id").setSortable(true).setWidth("6rem");
+        stripedGrid.addColumn("nativeId").setHeader("Native Id").setSortable(true).setWidth("6rem");
         stripedGrid.addColumn("parameters").setWidth("18rem");
+        stripedGrid.addColumn("label").setWidth("6rem");
+        stripedGrid.addColumn("branch").setWidth("8rem");
 //        stripedGrid.addColumn("started").setSortable(true);
         stripedGrid.addColumn(new LocalDateTimeRenderer<>(
                         ObservDTO::getStarted, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)))
@@ -85,12 +88,6 @@ public class ObservView extends Composite<VerticalLayout> {
                         ObservDTO::getEnded, () -> DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,                         FormatStyle.MEDIUM)))
                 .setHeader("Ended").setWidth("12rem");
         stripedGrid.addColumn("status").setSortable(true).setWidth("8rem");
-
-        stripedGrid.addColumn(new ComponentRenderer<>(item -> {
-            Button button = new Button(VaadinIcon.GRID_SMALL.create());
-            button.addClickListener(event -> openPopup(item));  // Ope
-            return button;
-        })).setHeader("Details");
 
         stripedGrid.addColumn(new ComponentRenderer<>(item -> {
             Button button = new Button(VaadinIcon.GLASSES.create());

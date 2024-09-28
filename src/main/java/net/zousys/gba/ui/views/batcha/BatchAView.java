@@ -131,7 +131,7 @@ public class BatchAView extends Composite<VerticalLayout> {
         getContent().add(tabs);
         getContent().add(stripedGrid, rowLayout);
 
-//        loadPage(page);
+
     }
 
     private void setTabsSampleData(Tabs tabs) {
